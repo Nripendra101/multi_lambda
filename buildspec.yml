@@ -1,11 +1,16 @@
 version: 0.2
 
 phases:
+  install:
+    commands:
+      - echo "Fetching full Git history..."
+      - git fetch --unshallow  # Ensures we have the full commit history
+
   build:
     commands:
       - echo "Detecting changed Lambda functions..."
       - |
-        CHANGED_FUNCTIONS=$(git diff --name-only $CODEBUILD_SOURCE_VERSION^ $CODEBUILD_SOURCE_VERSION | awk -F'/' '{print $1}' | sort -u)
+        CHANGED_FUNCTIONS=$(git diff --name-only HEAD~1 HEAD | awk -F'/' '{print $1}' | sort -u)
         echo "Changed functions: $CHANGED_FUNCTIONS"
 
         for function in $CHANGED_FUNCTIONS; do
